@@ -1,0 +1,28 @@
+{
+  "chatgpt": {
+    "input": [
+      "#prompt-textarea",
+      "textarea[placeholder*='Message']",
+      "textarea[data-testid='chat-input-textarea']",
+      "div[contenteditable='true']"
+    ],
+    "submit": [
+      "button[data-testid='send-button']",
+      "button[aria-label*='Send']",
+      "button[type='submit']"
+    ]
+  },
+  "gemini": {
+    "input": [
+      "rich-textarea",
+      "div[role='textbox']",
+      "[contenteditable='true']",
+      "textarea"
+    ],
+    "submit": [
+      "button[aria-label*='Send']",
+      "button[data-testid='send-button']",
+      "div[class*='send-button'] button"
+    ]
+  }
+}
