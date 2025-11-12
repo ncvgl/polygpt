@@ -7,6 +7,9 @@ const errorBanner = document.getElementById('errorBanner');
 const errorMessage = document.getElementById('errorMessage');
 const retryBtn = document.getElementById('retryBtn');
 const refreshBtn = document.getElementById('refreshBtn');
+const newChatBtn = document.getElementById('newChatBtn');
+const zoomInBtn = document.getElementById('zoomInBtn');
+const zoomOutBtn = document.getElementById('zoomOutBtn');
 
 let currentText = '';
 
@@ -80,6 +83,32 @@ retryBtn.addEventListener('click', () => {
 refreshBtn.addEventListener('click', () => {
   ipcRenderer.invoke('refresh-pages').catch((error) => {
     console.error('Failed to refresh:', error);
+  });
+});
+
+// New chat button handler
+newChatBtn.addEventListener('click', () => {
+  ipcRenderer.invoke('new-chat').catch((error) => {
+    console.error('Failed to start new chat:', error);
+  });
+
+  // Clear the input when starting new chat
+  textInput.value = '';
+  currentText = '';
+  updateCharCount();
+});
+
+// Zoom in button handler
+zoomInBtn.addEventListener('click', () => {
+  ipcRenderer.invoke('zoom-in').catch((error) => {
+    console.error('Failed to zoom in:', error);
+  });
+});
+
+// Zoom out button handler
+zoomOutBtn.addEventListener('click', () => {
+  ipcRenderer.invoke('zoom-out').catch((error) => {
+    console.error('Failed to zoom out:', error);
   });
 });
 

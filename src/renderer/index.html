@@ -17,13 +17,18 @@
       <textarea
         id="textInput"
         class="text-input"
-        placeholder="Type here to mirror to both ChatGPT and Gemini..."
+        placeholder="Type here to mirror to ChatGPT, Gemini, Perplexity, and Claude..."
         spellcheck="true"
       ></textarea>
       <div class="input-info">
         <span><span id="charCount">0</span> characters</span>
         <span><kbd>Enter</kbd> to submit | <kbd>Shift+Enter</kbd> for new line</span>
-        <button id="refreshBtn" class="refresh-btn" title="Refresh both pages">🔄 Refresh</button>
+        <div class="button-group">
+          <button id="newChatBtn" class="action-btn new-chat-btn" title="Start new chat in both">✨ New Chat</button>
+          <button id="refreshBtn" class="action-btn refresh-btn" title="Refresh both pages">🔄 Refresh</button>
+          <button id="zoomOutBtn" class="action-btn zoom-btn zoom-out-btn" title="Zoom out">−</button>
+          <button id="zoomInBtn" class="action-btn zoom-btn zoom-in-btn" title="Zoom in">+</button>
+        </div>
       </div>
     </div>
   </div>

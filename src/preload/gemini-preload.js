@@ -73,14 +73,28 @@ function injectText(text) {
   // Handle different element types
   if (inputElement.tagName === 'TEXTAREA') {
     inputElement.value = text;
+    inputElement.selectionStart = text.length;
+    inputElement.selectionEnd = text.length;
   } else if (inputElement.contentEditable === 'true' || inputElement.tagName === 'P') {
-    // Clear existing content and set text
-    inputElement.textContent = text;
+    // Handle contenteditable (Quill editor) - preserve newlines as <br>
+    // Clear existing content - avoid innerHTML due to TrustedHTML CSP
+    while (inputElement.firstChild) {
+      inputElement.removeChild(inputElement.firstChild);
+    }
+
+    // Split by newlines and create text nodes with <br> between them
+    const lines = text.split('\n');
+    lines.forEach((line, index) => {
+      inputElement.appendChild(document.createTextNode(line));
+      if (index < lines.length - 1) {
+        inputElement.appendChild(document.createElement('br'));
+      }
+    });
   } else if (inputElement.tagName === 'INPUT') {
     inputElement.value = text;
   } else {
-    // Try innerHTML for richtext
-    inputElement.innerHTML = escapeHtml(text);
+    // Try textContent for richtext
+    inputElement.textContent = text;
   }
 
   // Dispatch events to trigger React/framework detection
@@ -142,6 +156,16 @@ ipcRenderer.on('text-update', (event, text) => {
 // Listen for submit signal
 ipcRenderer.on('submit-message', () => {
   submitMessage();
+});
+
+// Listen for new chat signal
+ipcRenderer.on('new-chat', () => {
+  const newChatButton = findElement(config.gemini?.newChat);
+  if (newChatButton) {
+    newChatButton.click();
+  } else {
+    console.warn('[Gemini] New chat button not found');
+  }
 });
 
 // Rescan selectors when needed

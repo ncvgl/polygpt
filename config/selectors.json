@@ -10,6 +10,12 @@
       "button[data-testid='send-button']",
       "button[aria-label*='Send']",
       "button[type='submit']"
+    ],
+    "newChat": [
+      "a[href='/']",
+      "button[aria-label*='New chat']",
+      "a[aria-label*='New chat']",
+      "[data-testid='new-chat-button']"
     ]
   },
   "gemini": {
@@ -23,6 +29,49 @@
       "button[aria-label*='Send']",
       "button[data-testid='send-button']",
       "div[class*='send-button'] button"
+    ],
+    "newChat": [
+      "button[aria-label*='New chat']",
+      "a[aria-label*='New chat']",
+      "button[title*='New chat']",
+      "[data-testid='new-chat-button']"
+    ]
+  },
+  "perplexity": {
+    "input": [
+      "#ask-input",
+      "div[data-lexical-editor='true']",
+      "[contenteditable='true'][role='textbox']",
+      "[contenteditable='true']"
+    ],
+    "submit": [
+      "button[data-testid='submit-button']",
+      "button[aria-label='Submit']",
+      "button[type='submit']"
+    ],
+    "newChat": [
+      "button[aria-label*='New']",
+      "a[aria-label*='New']",
+      "button[title*='New thread']",
+      "[data-testid='new-thread-button']"
+    ]
+  },
+  "claude": {
+    "input": [
+      "div[data-testid='chat-input']",
+      "div[contenteditable='true'][role='textbox']",
+      "div.ProseMirror",
+      "[role='textbox']"
+    ],
+    "submit": [
+      "button[aria-label='Send message']",
+      "button[aria-label*='Send']",
+      "button[type='submit']"
+    ],
+    "newChat": [
+      "button[aria-label*='New']",
+      "a[aria-label*='New']",
+      "button[title*='New chat']"
     ]
   }
 }

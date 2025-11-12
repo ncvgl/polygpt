@@ -51,9 +51,24 @@ function injectText(text) {
   // Handle textarea
   if (inputElement.tagName === 'TEXTAREA') {
     inputElement.value = text;
+    // Set selection to end of text
+    inputElement.selectionStart = text.length;
+    inputElement.selectionEnd = text.length;
   } else if (inputElement.contentEditable === 'true') {
-    // Handle contenteditable div
-    inputElement.textContent = text;
+    // Handle contenteditable div (ProseMirror) - preserve newlines as <br>
+    // Clear existing content - avoid innerHTML due to TrustedHTML CSP
+    while (inputElement.firstChild) {
+      inputElement.removeChild(inputElement.firstChild);
+    }
+
+    // Split by newlines and create text nodes with <br> between them
+    const lines = text.split('\n');
+    lines.forEach((line, index) => {
+      inputElement.appendChild(document.createTextNode(line));
+      if (index < lines.length - 1) {
+        inputElement.appendChild(document.createElement('br'));
+      }
+    });
   } else if (inputElement.tagName === 'INPUT') {
     inputElement.value = text;
   }
@@ -109,6 +124,16 @@ ipcRenderer.on('text-update', (event, text) => {
 // Listen for submit signal
 ipcRenderer.on('submit-message', () => {
   submitMessage();
+});
+
+// Listen for new chat signal
+ipcRenderer.on('new-chat', () => {
+  const newChatButton = findElement(config.chatgpt?.newChat);
+  if (newChatButton) {
+    newChatButton.click();
+  } else {
+    console.warn('[ChatGPT] New chat button not found');
+  }
 });
 
 // Rescan selectors when needed

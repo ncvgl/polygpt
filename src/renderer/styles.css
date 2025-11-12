@@ -107,9 +107,13 @@ kbd {
   color: #333;
 }
 
-.refresh-btn {
+.button-group {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
   padding: 4px 10px;
-  background: #4285f4;
   color: white;
   border: none;
   border-radius: 4px;
@@ -120,10 +124,32 @@ kbd {
   white-space: nowrap;
 }
 
+.action-btn:active {
+  opacity: 0.8;
+}
+
+.new-chat-btn {
+  background: #9c27b0;
+}
+
+.new-chat-btn:hover {
+  background: #7b1fa2;
+}
+
+.refresh-btn {
+  background: #4285f4;
+}
+
 .refresh-btn:hover {
   background: #1f6db8;
 }
 
-.refresh-btn:active {
-  opacity: 0.8;
+.zoom-btn {
+  background: #ff9800;
+  padding: 4px 8px;
+  min-width: 32px;
+}
+
+.zoom-btn:hover {
+  background: #f57c00;
 }

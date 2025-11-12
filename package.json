@@ -23,7 +23,18 @@
     "files": [
       "src/**/*",
       "config/**/*",
+      "assets/**/*",
       "package.json"
-    ]
+    ],
+    "mac": {
+      "icon": "assets/icons/icon.icns",
+      "category": "public.app-category.productivity"
+    },
+    "win": {
+      "icon": "assets/icons/no_text.png"
+    },
+    "linux": {
+      "icon": "assets/icons/no_text.png"
+    }
   }
 }
