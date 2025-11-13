@@ -2,6 +2,12 @@
 
 Mirror text to ChatGPT and Gemini simultaneously. Type once in a bottom control bar and watch your text appear in both AI interfaces side-by-side.
 
+## Demo
+
+<video src="https://storage.googleapis.com/polygpt-assets/demo.mp4" width="100%" controls></video>
+
+> **Note:** If the video doesn't play above, [click here to watch it](https://storage.googleapis.com/polygpt-assets/demo.mp4).
+
 ## Requirements
 
 - Node.js 14+ and npm
