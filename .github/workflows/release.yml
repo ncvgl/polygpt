@@ -82,6 +82,18 @@ jobs:
       - name: Display structure
         run: ls -R artifacts/
 
+      - name: Create version-less copies for permanent URLs
+        run: |
+          cd artifacts
+          # macOS
+          cp macos-build/*.dmg macos-build/PolyGPT-universal.dmg || true
+          # Windows
+          cp windows-build/*Setup*.exe windows-build/PolyGPT-Setup.exe || true
+          # Linux
+          cp linux-build/*.AppImage linux-build/PolyGPT.AppImage || true
+          cp linux-build/*.deb linux-build/polygpt_amd64.deb || true
+          ls -R
+
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
