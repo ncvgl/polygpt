@@ -242,7 +242,7 @@ async function createWindow() {
   }
 
   // Change provider for a position
-  function changeProvider(position, newProviderKey) {
+  function changeProvider(position, newProviderKey, zoomFactor = 1.0) {
     // Get old view
     const oldView = viewPositions[position];
 
@@ -268,6 +268,10 @@ async function createWindow() {
 
     // Send view info to new view after it loads
     newView.webContents.on('did-finish-load', () => {
+      // Set zoom factor for new view
+      newView.webContents.setZoomFactor(zoomFactor);
+
+      // Send view info
       newView.webContents.send('view-info', {
         position,
         provider: newProviderKey,

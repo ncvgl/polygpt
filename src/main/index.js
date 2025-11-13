@@ -129,13 +129,7 @@ app.on('ready', async () => {
   // Handle change provider request
   ipcMain.handle('change-provider', async (event, position, newProvider) => {
     if (mainWindow.changeProvider) {
-      const result = mainWindow.changeProvider(position, newProvider);
-      // Also apply current zoom to new view
-      const view = mainWindow.viewPositions[position];
-      if (view && view.webContents) {
-        view.webContents.setZoomFactor(currentZoomFactor);
-      }
-      return result;
+      return mainWindow.changeProvider(position, newProvider, currentZoomFactor);
     }
     return false;
   });
