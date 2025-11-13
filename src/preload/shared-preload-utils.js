@@ -87,12 +87,14 @@ function setupInputScanner(provider, config, getInputElement, setInputElement, f
   }, 500);
 }
 
-function createUIControls(viewInfo) {
+function removeExistingControls() {
   const existingContainer = document.getElementById('polygpt-controls-container');
   if (existingContainer) {
     existingContainer.remove();
   }
+}
 
+function createControlsContainer() {
   const container = document.createElement('div');
   container.id = 'polygpt-controls-container';
   Object.assign(container.style, {
@@ -104,10 +106,17 @@ function createUIControls(viewInfo) {
     zIndex: '9999999',
     pointerEvents: 'auto',
   });
+  return container;
+}
 
+function createProviderDropdown() {
   const dropdown = document.createElement('select');
   dropdown.id = 'polygpt-provider-dropdown';
   dropdown.title = 'Switch Provider';
+  return dropdown;
+}
+
+function styleDropdown(dropdown) {
   Object.assign(dropdown.style, {
     border: 'none',
     borderRadius: '6px',
@@ -123,7 +132,9 @@ function createUIControls(viewInfo) {
     WebkitAppearance: 'none',
     MozAppearance: 'none',
   });
+}
 
+function populateDropdownOptions(dropdown, viewInfo) {
   viewInfo.availableProviders.forEach(provider => {
     const option = document.createElement('option');
     option.value = provider.key;
@@ -133,7 +144,9 @@ function createUIControls(viewInfo) {
     }
     dropdown.appendChild(option);
   });
+}
 
+function attachDropdownEventListeners(dropdown, viewInfo) {
   dropdown.addEventListener('change', async () => {
     await ipcRenderer.invoke('change-provider', viewInfo.position, dropdown.value);
   });
@@ -145,10 +158,16 @@ function createUIControls(viewInfo) {
   dropdown.addEventListener('mouseleave', () => {
     dropdown.style.background = 'rgba(0, 0, 0, 0.5)';
   });
+}
 
+function createSupersizeButton() {
   const button = document.createElement('button');
   button.id = 'polygpt-supersize-btn';
   button.title = 'Supersize / Restore';
+  return button;
+}
+
+function styleButton(button) {
   Object.assign(button.style, {
     border: 'none',
     borderRadius: '6px',
@@ -165,7 +184,9 @@ function createUIControls(viewInfo) {
     padding: '0',
     fontSize: '16px',
   });
+}
 
+function createButtonIcons(button) {
   const expandIcon = document.createElement('span');
   expandIcon.className = 'icon-expand';
   expandIcon.textContent = '⛶';
@@ -178,7 +199,9 @@ function createUIControls(viewInfo) {
 
   button.appendChild(expandIcon);
   button.appendChild(collapseIcon);
+}
 
+function attachButtonEventListeners(button, viewInfo) {
   button.addEventListener('mouseenter', () => {
     button.style.background = 'rgba(0, 0, 0, 0.7)';
   });
@@ -198,6 +221,22 @@ function createUIControls(viewInfo) {
   button.addEventListener('click', async () => {
     await ipcRenderer.invoke('toggle-supersize', viewInfo.position);
   });
+}
+
+function createUIControls(viewInfo) {
+  removeExistingControls();
+
+  const container = createControlsContainer();
+
+  const dropdown = createProviderDropdown();
+  styleDropdown(dropdown);
+  populateDropdownOptions(dropdown, viewInfo);
+  attachDropdownEventListeners(dropdown, viewInfo);
+
+  const button = createSupersizeButton();
+  styleButton(button);
+  createButtonIcons(button);
+  attachButtonEventListeners(button, viewInfo);
 
   container.appendChild(dropdown);
   container.appendChild(button);
