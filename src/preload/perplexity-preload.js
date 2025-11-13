@@ -181,25 +181,12 @@ ipcRenderer.on('new-chat', () => {
   }
 });
 
-// Rescan selectors when needed
-function rescanSelectors() {
-  inputElement = null;
-  submitElement = null;
-  console.log('[Perplexity] Selectors rescanned');
-}
-
-// Expose safe API via contextBridge
-contextBridge.exposeInMainWorld('perplexityApi', {
-  rescanSelectors,
-});
-
-// Periodically rescan selectors if not found
 let scanAttempts = 0;
 const scanInterval = setInterval(() => {
   if (!inputElement && scanAttempts < 10) {
     inputElement = findElement(config.perplexity?.input);
     scanAttempts++;
-  } else if (inputElement) {
+  } else {
     clearInterval(scanInterval);
   }
 }, 500);

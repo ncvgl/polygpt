@@ -158,26 +158,13 @@ ipcRenderer.on('new-chat', () => {
   }
 });
 
-// Rescan selectors when needed
-function rescanSelectors() {
-  inputElement = null;
-  submitElement = null;
-  console.log('[Gemini] Selectors rescanned');
-}
-
-// Expose safe API via contextBridge
-contextBridge.exposeInMainWorld('geminiApi', {
-  rescanSelectors,
-});
-
-// Periodically rescan selectors if not found
 let scanAttempts = 0;
 const scanInterval = setInterval(() => {
   if (!inputElement && scanAttempts < 10) {
     const rawElement = findElement(config.gemini?.input);
     inputElement = findGeminiInput(rawElement);
     scanAttempts++;
-  } else if (inputElement) {
+  } else {
     clearInterval(scanInterval);
   }
 }, 500);

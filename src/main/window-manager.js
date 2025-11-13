@@ -1,4 +1,4 @@
-const { BaseWindow, WebContentsView, ipcMain } = require('electron');
+const { BaseWindow, WebContentsView } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -342,7 +342,6 @@ async function createWindow() {
   mainWindow.toggleSupersize = toggleSupersize;
   mainWindow.changeProvider = changeProvider;
   mainWindow.getSupersizedPosition = () => supersizedPosition;
-  mainWindow.getProviderConfig = () => providerConfig;
 
   return mainWindow;
 }

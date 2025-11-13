@@ -1,5 +1,4 @@
-const { app, BaseWindow, ipcMain } = require('electron');
-const path = require('path');
+const { app, ipcMain } = require('electron');
 const windowManager = require('./window-manager');
 
 let mainWindow;
@@ -29,14 +28,22 @@ app.on('ready', async () => {
     }
   });
 
-  // Forward errors from preload scripts back to renderer
   ipcMain.handle('selector-error', async (event, source, error) => {
     if (mainWindow.mainView && mainWindow.mainView.webContents) {
       mainWindow.mainView.webContents.send('selector-error', { source, error });
     }
   });
 
-  // Handle refresh pages request
+  ipcMain.handle('rescan-selectors', async (event) => {
+    windowManager.POSITIONS.forEach(pos => {
+      const view = mainWindow.viewPositions[pos];
+      if (view && view.webContents) {
+        view.webContents.reload();
+      }
+    });
+    return true;
+  });
+
   ipcMain.handle('refresh-pages', async (event) => {
     windowManager.POSITIONS.forEach(pos => {
       const view = mainWindow.viewPositions[pos];

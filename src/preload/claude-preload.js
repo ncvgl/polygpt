@@ -136,25 +136,12 @@ ipcRenderer.on('new-chat', () => {
   }
 });
 
-// Rescan selectors when needed
-function rescanSelectors() {
-  inputElement = null;
-  submitElement = null;
-  console.log('[Claude] Selectors rescanned');
-}
-
-// Expose safe API via contextBridge
-contextBridge.exposeInMainWorld('claudeApi', {
-  rescanSelectors,
-});
-
-// Periodically rescan selectors if not found
 let scanAttempts = 0;
 const scanInterval = setInterval(() => {
   if (!inputElement && scanAttempts < 10) {
     inputElement = findElement(config.claude?.input);
     scanAttempts++;
-  } else if (inputElement) {
+  } else {
     clearInterval(scanInterval);
   }
 }, 500);
