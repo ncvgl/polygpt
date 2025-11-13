@@ -26,21 +26,15 @@ jobs:
 
       - name: Build for macOS
         if: matrix.os == 'macos-latest'
-        run: npm run build -- --mac
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run build -- --mac --publish never
 
       - name: Build for Windows
         if: matrix.os == 'windows-latest'
-        run: npm run build -- --win
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run build -- --win --publish never
 
       - name: Build for Linux
         if: matrix.os == 'ubuntu-latest'
-        run: npm run build -- --linux
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run build -- --linux --publish never
 
       - name: Upload macOS artifacts
         if: matrix.os == 'macos-latest'
