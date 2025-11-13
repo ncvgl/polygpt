@@ -191,3 +191,97 @@ const scanInterval = setInterval(() => {
     clearInterval(scanInterval);
   }
 }, 500);
+
+// Inject supersize button
+function createSupersizeButton() {
+  const button = document.createElement('button');
+  button.id = 'polygpt-supersize-btn';
+  button.title = 'Expand/Collapse';
+
+  // Create icon spans without using innerHTML to avoid CSP issues
+  const expandIcon = document.createElement('span');
+  expandIcon.className = 'icon-expand';
+  expandIcon.textContent = '⛶';
+
+  const collapseIcon = document.createElement('span');
+  collapseIcon.className = 'icon-collapse';
+  collapseIcon.textContent = '⬓';
+  collapseIcon.style.display = 'none';
+
+  button.appendChild(expandIcon);
+  button.appendChild(collapseIcon);
+
+  // Apply styles
+  Object.assign(button.style, {
+    position: 'fixed',
+    top: '8px',
+    right: '8px',
+    width: '32px',
+    height: '32px',
+    border: 'none',
+    borderRadius: '6px',
+    background: 'rgba(0, 0, 0, 0.5)',
+    color: 'white',
+    fontSize: '16px',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: '999999',
+    backdropFilter: 'blur(4px)',
+    transition: 'all 0.2s ease',
+  });
+
+  button.addEventListener('mouseenter', () => {
+    button.style.background = 'rgba(0, 0, 0, 0.7)';
+    button.style.transform = 'scale(1.1)';
+  });
+
+  button.addEventListener('mouseleave', () => {
+    button.style.background = 'rgba(0, 0, 0, 0.5)';
+    button.style.transform = 'scale(1)';
+  });
+
+  button.addEventListener('mousedown', () => {
+    button.style.transform = 'scale(0.95)';
+  });
+
+  button.addEventListener('mouseup', () => {
+    button.style.transform = 'scale(1.1)';
+  });
+
+  button.addEventListener('click', async () => {
+    try {
+      await ipcRenderer.invoke('toggle-supersize', 'gemini');
+    } catch (error) {
+      console.error('Failed to toggle supersize:', error);
+    }
+  });
+
+  document.body.appendChild(button);
+  return button;
+}
+
+// Listen for supersize state changes
+ipcRenderer.on('supersize-state-changed', (event, supersizedView) => {
+  const button = document.getElementById('polygpt-supersize-btn');
+  if (!button) return;
+
+  const expandIcon = button.querySelector('.icon-expand');
+  const collapseIcon = button.querySelector('.icon-collapse');
+
+  if (supersizedView === 'gemini') {
+    expandIcon.style.display = 'none';
+    collapseIcon.style.display = 'block';
+  } else {
+    expandIcon.style.display = 'block';
+    collapseIcon.style.display = 'none';
+  }
+});
+
+// Wait for DOM to be ready before injecting button
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', createSupersizeButton);
+} else {
+  createSupersizeButton();
+}

@@ -74,48 +74,11 @@ async function createWindow() {
     },
   });
 
-  // Create overlay views for supersize buttons
-  const claudeOverlay = new WebContentsView({
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      transparent: true,
-    },
-  });
-
-  const perplexityOverlay = new WebContentsView({
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      transparent: true,
-    },
-  });
-
-  const chatgptOverlay = new WebContentsView({
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      transparent: true,
-    },
-  });
-
-  const geminiOverlay = new WebContentsView({
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      transparent: true,
-    },
-  });
-
-  // Add views to window (overlays on top)
+  // Add views to window
   mainWindow.contentView.addChildView(chatgptView);
   mainWindow.contentView.addChildView(geminiView);
   mainWindow.contentView.addChildView(perplexityView);
   mainWindow.contentView.addChildView(claudeView);
-  mainWindow.contentView.addChildView(chatgptOverlay);
-  mainWindow.contentView.addChildView(geminiOverlay);
-  mainWindow.contentView.addChildView(perplexityOverlay);
-  mainWindow.contentView.addChildView(claudeOverlay);
   mainWindow.contentView.addChildView(mainView);
 
   // Set bounds for views (updated on resize)
@@ -133,44 +96,36 @@ async function createWindow() {
       const gap = 1; // 1px gap for separators
 
       // Top-left: Claude
-      const claudeBounds = {
+      claudeView.setBounds({
         x: 0,
         y: 0,
         width: halfWidth - Math.floor(gap / 2),
         height: halfHeight - Math.floor(gap / 2),
-      };
-      claudeView.setBounds(claudeBounds);
-      claudeOverlay.setBounds(claudeBounds);
+      });
 
       // Top-right: Perplexity
-      const perplexityBounds = {
+      perplexityView.setBounds({
         x: halfWidth + Math.ceil(gap / 2),
         y: 0,
         width: width - halfWidth - Math.ceil(gap / 2),
         height: halfHeight - Math.floor(gap / 2),
-      };
-      perplexityView.setBounds(perplexityBounds);
-      perplexityOverlay.setBounds(perplexityBounds);
+      });
 
       // Bottom-left: ChatGPT
-      const chatgptBounds = {
+      chatgptView.setBounds({
         x: 0,
         y: halfHeight + Math.ceil(gap / 2),
         width: halfWidth - Math.floor(gap / 2),
         height: chatAreaHeight - halfHeight - Math.ceil(gap / 2),
-      };
-      chatgptView.setBounds(chatgptBounds);
-      chatgptOverlay.setBounds(chatgptBounds);
+      });
 
       // Bottom-right: Gemini
-      const geminiBounds = {
+      geminiView.setBounds({
         x: halfWidth + Math.ceil(gap / 2),
         y: halfHeight + Math.ceil(gap / 2),
         width: width - halfWidth - Math.ceil(gap / 2),
         height: chatAreaHeight - halfHeight - Math.ceil(gap / 2),
-      };
-      geminiView.setBounds(geminiBounds);
-      geminiOverlay.setBounds(geminiBounds);
+      });
     } else {
       // Supersized mode: one view takes 80%, others are thumbnails
       const mainWidth = Math.floor(width * 0.8);
@@ -179,34 +134,30 @@ async function createWindow() {
       const gap = 1;
 
       const views = {
-        claude: { view: claudeView, overlay: claudeOverlay },
-        perplexity: { view: perplexityView, overlay: perplexityOverlay },
-        chatgpt: { view: chatgptView, overlay: chatgptOverlay },
-        gemini: { view: geminiView, overlay: geminiOverlay },
+        claude: claudeView,
+        perplexity: perplexityView,
+        chatgpt: chatgptView,
+        gemini: geminiView,
       };
 
       // Position supersized view
       const supersized = views[supersizedView];
-      const supersizedBounds = {
+      supersized.setBounds({
         x: 0,
         y: 0,
         width: mainWidth,
         height: chatAreaHeight,
-      };
-      supersized.view.setBounds(supersizedBounds);
-      supersized.overlay.setBounds(supersizedBounds);
+      });
 
       // Position thumbnails vertically on the right
       const thumbnails = Object.entries(views).filter(([id]) => id !== supersizedView);
-      thumbnails.forEach(([id, { view, overlay }], index) => {
-        const thumbnailBounds = {
+      thumbnails.forEach(([id, view], index) => {
+        view.setBounds({
           x: mainWidth + 2,
           y: index * (thumbnailHeight + gap),
           width: thumbnailWidth,
           height: thumbnailHeight - (index < thumbnails.length - 1 ? gap : 0),
-        };
-        view.setBounds(thumbnailBounds);
-        overlay.setBounds(thumbnailBounds);
+        });
       });
     }
 
@@ -228,11 +179,11 @@ async function createWindow() {
     }
     updateBounds();
 
-    // Notify all overlays of state change
-    claudeOverlay.webContents.send('supersize-state-changed', supersizedView);
-    perplexityOverlay.webContents.send('supersize-state-changed', supersizedView);
-    chatgptOverlay.webContents.send('supersize-state-changed', supersizedView);
-    geminiOverlay.webContents.send('supersize-state-changed', supersizedView);
+    // Notify all service views of state change
+    claudeView.webContents.send('supersize-state-changed', supersizedView);
+    perplexityView.webContents.send('supersize-state-changed', supersizedView);
+    chatgptView.webContents.send('supersize-state-changed', supersizedView);
+    geminiView.webContents.send('supersize-state-changed', supersizedView);
 
     return supersizedView;
   }
@@ -246,24 +197,6 @@ async function createWindow() {
   geminiView.webContents.loadURL('https://gemini.google.com');
   perplexityView.webContents.loadURL('https://www.perplexity.ai');
   claudeView.webContents.loadURL('https://claude.ai');
-
-  // Load overlay controls with view IDs
-  claudeOverlay.webContents.loadFile(
-    path.join(__dirname, '../renderer/overlay.html'),
-    { query: { view: 'claude' } }
-  );
-  perplexityOverlay.webContents.loadFile(
-    path.join(__dirname, '../renderer/overlay.html'),
-    { query: { view: 'perplexity' } }
-  );
-  chatgptOverlay.webContents.loadFile(
-    path.join(__dirname, '../renderer/overlay.html'),
-    { query: { view: 'chatgpt' } }
-  );
-  geminiOverlay.webContents.loadFile(
-    path.join(__dirname, '../renderer/overlay.html'),
-    { query: { view: 'gemini' } }
-  );
 
   // Forward console messages from all views to terminal
   chatgptView.webContents.on('console-message', (event, level, message, line, sourceId) => {
@@ -280,18 +213,6 @@ async function createWindow() {
   });
   mainView.webContents.on('console-message', (event, level, message, line, sourceId) => {
     console.log(`[ControlBar] ${message}`);
-  });
-  claudeOverlay.webContents.on('console-message', (event, level, message, line, sourceId) => {
-    console.log(`[ClaudeOverlay] ${message}`);
-  });
-  perplexityOverlay.webContents.on('console-message', (event, level, message, line, sourceId) => {
-    console.log(`[PerplexityOverlay] ${message}`);
-  });
-  chatgptOverlay.webContents.on('console-message', (event, level, message, line, sourceId) => {
-    console.log(`[ChatGPTOverlay] ${message}`);
-  });
-  geminiOverlay.webContents.on('console-message', (event, level, message, line, sourceId) => {
-    console.log(`[GeminiOverlay] ${message}`);
   });
 
   // Open dev tools in development
@@ -314,10 +235,6 @@ async function createWindow() {
   mainWindow.geminiView = geminiView;
   mainWindow.perplexityView = perplexityView;
   mainWindow.claudeView = claudeView;
-  mainWindow.chatgptOverlay = chatgptOverlay;
-  mainWindow.geminiOverlay = geminiOverlay;
-  mainWindow.perplexityOverlay = perplexityOverlay;
-  mainWindow.claudeOverlay = claudeOverlay;
   mainWindow.toggleSupersize = toggleSupersize;
   mainWindow.getSupersizedView = () => supersizedView;
 
