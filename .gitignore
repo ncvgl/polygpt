@@ -6,3 +6,4 @@ build/
 npm-debug.log*
 .env
 .env.local
+config/window-providers.json
