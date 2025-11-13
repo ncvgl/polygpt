@@ -10,34 +10,22 @@ app.on('ready', async () => {
 
   // IPC handler for text updates from renderer
   ipcMain.handle('send-text-update', async (event, text) => {
-    const supersizedView = mainWindow.getSupersizedView ? mainWindow.getSupersizedView() : null;
+    const supersizedPosition = mainWindow.getSupersizedPosition ? mainWindow.getSupersizedPosition() : null;
 
-    // If supersized, only send to that view
-    if (supersizedView) {
-      const viewMap = {
-        chatgpt: mainWindow.chatgptView,
-        gemini: mainWindow.geminiView,
-        perplexity: mainWindow.perplexityView,
-        claude: mainWindow.claudeView,
-      };
-      const targetView = viewMap[supersizedView];
-      if (targetView && targetView.webContents) {
-        targetView.webContents.send('text-update', text);
+    // If supersized, only send to that position
+    if (supersizedPosition) {
+      const view = mainWindow.viewPositions[supersizedPosition];
+      if (view && view.webContents) {
+        view.webContents.send('text-update', text);
       }
     } else {
-      // Send text to all 4 preload scripts
-      if (mainWindow.chatgptView && mainWindow.chatgptView.webContents) {
-        mainWindow.chatgptView.webContents.send('text-update', text);
-      }
-      if (mainWindow.geminiView && mainWindow.geminiView.webContents) {
-        mainWindow.geminiView.webContents.send('text-update', text);
-      }
-      if (mainWindow.perplexityView && mainWindow.perplexityView.webContents) {
-        mainWindow.perplexityView.webContents.send('text-update', text);
-      }
-      if (mainWindow.claudeView && mainWindow.claudeView.webContents) {
-        mainWindow.claudeView.webContents.send('text-update', text);
-      }
+      // Send text to all positions
+      windowManager.POSITIONS.forEach(pos => {
+        const view = mainWindow.viewPositions[pos];
+        if (view && view.webContents) {
+          view.webContents.send('text-update', text);
+        }
+      });
     }
   });
 
@@ -50,69 +38,45 @@ app.on('ready', async () => {
 
   // Handle refresh pages request
   ipcMain.handle('refresh-pages', async (event) => {
-    if (mainWindow.chatgptView && mainWindow.chatgptView.webContents) {
-      mainWindow.chatgptView.webContents.reload();
-    }
-    if (mainWindow.geminiView && mainWindow.geminiView.webContents) {
-      mainWindow.geminiView.webContents.reload();
-    }
-    if (mainWindow.perplexityView && mainWindow.perplexityView.webContents) {
-      mainWindow.perplexityView.webContents.reload();
-    }
-    if (mainWindow.claudeView && mainWindow.claudeView.webContents) {
-      mainWindow.claudeView.webContents.reload();
-    }
+    windowManager.POSITIONS.forEach(pos => {
+      const view = mainWindow.viewPositions[pos];
+      if (view && view.webContents) {
+        view.webContents.reload();
+      }
+    });
     return true;
   });
 
   // Handle submit message request
   ipcMain.handle('submit-message', async (event) => {
-    const supersizedView = mainWindow.getSupersizedView ? mainWindow.getSupersizedView() : null;
+    const supersizedPosition = mainWindow.getSupersizedPosition ? mainWindow.getSupersizedPosition() : null;
 
-    // If supersized, only submit to that view
-    if (supersizedView) {
-      const viewMap = {
-        chatgpt: mainWindow.chatgptView,
-        gemini: mainWindow.geminiView,
-        perplexity: mainWindow.perplexityView,
-        claude: mainWindow.claudeView,
-      };
-      const targetView = viewMap[supersizedView];
-      if (targetView && targetView.webContents) {
-        targetView.webContents.send('submit-message');
+    // If supersized, only submit to that position
+    if (supersizedPosition) {
+      const view = mainWindow.viewPositions[supersizedPosition];
+      if (view && view.webContents) {
+        view.webContents.send('submit-message');
       }
     } else {
-      // Submit to all 4 views
-      if (mainWindow.chatgptView && mainWindow.chatgptView.webContents) {
-        mainWindow.chatgptView.webContents.send('submit-message');
-      }
-      if (mainWindow.geminiView && mainWindow.geminiView.webContents) {
-        mainWindow.geminiView.webContents.send('submit-message');
-      }
-      if (mainWindow.perplexityView && mainWindow.perplexityView.webContents) {
-        mainWindow.perplexityView.webContents.send('submit-message');
-      }
-      if (mainWindow.claudeView && mainWindow.claudeView.webContents) {
-        mainWindow.claudeView.webContents.send('submit-message');
-      }
+      // Submit to all positions
+      windowManager.POSITIONS.forEach(pos => {
+        const view = mainWindow.viewPositions[pos];
+        if (view && view.webContents) {
+          view.webContents.send('submit-message');
+        }
+      });
     }
     return true;
   });
 
   // Handle new chat request
   ipcMain.handle('new-chat', async (event) => {
-    if (mainWindow.chatgptView && mainWindow.chatgptView.webContents) {
-      mainWindow.chatgptView.webContents.send('new-chat');
-    }
-    if (mainWindow.geminiView && mainWindow.geminiView.webContents) {
-      mainWindow.geminiView.webContents.send('new-chat');
-    }
-    if (mainWindow.perplexityView && mainWindow.perplexityView.webContents) {
-      mainWindow.perplexityView.webContents.send('new-chat');
-    }
-    if (mainWindow.claudeView && mainWindow.claudeView.webContents) {
-      mainWindow.claudeView.webContents.send('new-chat');
-    }
+    windowManager.POSITIONS.forEach(pos => {
+      const view = mainWindow.viewPositions[pos];
+      if (view && view.webContents) {
+        view.webContents.send('new-chat');
+      }
+    });
     return true;
   });
 
@@ -121,18 +85,12 @@ app.on('ready', async () => {
     const newZoom = Math.min(currentZoomFactor + 0.1, 2.0); // Max 200%
     currentZoomFactor = newZoom;
 
-    if (mainWindow.chatgptView && mainWindow.chatgptView.webContents) {
-      mainWindow.chatgptView.webContents.setZoomFactor(newZoom);
-    }
-    if (mainWindow.geminiView && mainWindow.geminiView.webContents) {
-      mainWindow.geminiView.webContents.setZoomFactor(newZoom);
-    }
-    if (mainWindow.perplexityView && mainWindow.perplexityView.webContents) {
-      mainWindow.perplexityView.webContents.setZoomFactor(newZoom);
-    }
-    if (mainWindow.claudeView && mainWindow.claudeView.webContents) {
-      mainWindow.claudeView.webContents.setZoomFactor(newZoom);
-    }
+    windowManager.POSITIONS.forEach(pos => {
+      const view = mainWindow.viewPositions[pos];
+      if (view && view.webContents) {
+        view.webContents.setZoomFactor(newZoom);
+      }
+    });
 
     return newZoom;
   });
@@ -142,29 +100,37 @@ app.on('ready', async () => {
     const newZoom = Math.max(currentZoomFactor - 0.1, 0.5); // Min 50%
     currentZoomFactor = newZoom;
 
-    if (mainWindow.chatgptView && mainWindow.chatgptView.webContents) {
-      mainWindow.chatgptView.webContents.setZoomFactor(newZoom);
-    }
-    if (mainWindow.geminiView && mainWindow.geminiView.webContents) {
-      mainWindow.geminiView.webContents.setZoomFactor(newZoom);
-    }
-    if (mainWindow.perplexityView && mainWindow.perplexityView.webContents) {
-      mainWindow.perplexityView.webContents.setZoomFactor(newZoom);
-    }
-    if (mainWindow.claudeView && mainWindow.claudeView.webContents) {
-      mainWindow.claudeView.webContents.setZoomFactor(newZoom);
-    }
+    windowManager.POSITIONS.forEach(pos => {
+      const view = mainWindow.viewPositions[pos];
+      if (view && view.webContents) {
+        view.webContents.setZoomFactor(newZoom);
+      }
+    });
 
     return newZoom;
   });
 
   // Handle toggle supersize request
-  ipcMain.handle('toggle-supersize', async (event, viewId) => {
+  ipcMain.handle('toggle-supersize', async (event, position) => {
     if (mainWindow.toggleSupersize) {
-      const supersizedView = mainWindow.toggleSupersize(viewId);
-      return supersizedView;
+      const supersizedPosition = mainWindow.toggleSupersize(position);
+      return supersizedPosition;
     }
     return null;
+  });
+
+  // Handle change provider request
+  ipcMain.handle('change-provider', async (event, position, newProvider) => {
+    if (mainWindow.changeProvider) {
+      const result = mainWindow.changeProvider(position, newProvider);
+      // Also apply current zoom to new view
+      const view = mainWindow.viewPositions[position];
+      if (view && view.webContents) {
+        view.webContents.setZoomFactor(currentZoomFactor);
+      }
+      return result;
+    }
+    return false;
   });
 });
 
