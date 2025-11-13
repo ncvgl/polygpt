@@ -1,6 +1,6 @@
 {
   "name": "polygpt",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Mirror text to ChatGPT and Gemini simultaneously",
   "main": "src/main/index.js",
   "homepage": "./",
