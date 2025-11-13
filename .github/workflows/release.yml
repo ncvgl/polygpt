@@ -86,12 +86,12 @@ jobs:
         run: |
           cd artifacts
           # macOS
-          cp macos-build/*.dmg macos-build/PolyGPT-universal.dmg || true
+          cp macos-build/*.dmg macos-build/polygpt.dmg || true
           # Windows
-          cp windows-build/*Setup*.exe windows-build/PolyGPT-Setup.exe || true
+          cp windows-build/*Setup*.exe windows-build/polygpt.exe || true
           # Linux
-          cp linux-build/*.AppImage linux-build/PolyGPT.AppImage || true
-          cp linux-build/*.deb linux-build/polygpt_amd64.deb || true
+          cp linux-build/*.AppImage linux-build/polygpt.AppImage || true
+          cp linux-build/*.deb linux-build/polygpt.deb || true
           ls -R
 
       - name: Upload to GitHub Release
