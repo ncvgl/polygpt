@@ -345,7 +345,6 @@ function createLoadingOverlay() {
   return overlay;
 }
 
-// Show loading overlay immediately
 let loadingOverlay = null;
 if (document.body) {
   loadingOverlay = createLoadingOverlay();
@@ -355,7 +354,6 @@ if (document.body) {
   });
 }
 
-// Hide loading overlay when page is fully loaded
 window.addEventListener('load', () => {
   if (loadingOverlay) {
     loadingOverlay.style.opacity = '0';

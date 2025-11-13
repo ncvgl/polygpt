@@ -93,11 +93,9 @@ function injectText(text) {
   } else if (inputElement.tagName === 'INPUT') {
     inputElement.value = text;
   } else {
-    // Try textContent for richtext
     inputElement.textContent = text;
   }
 
-  // Dispatch events to trigger React/framework detection
   const events = [
     new Event('input', { bubbles: true }),
     new Event('change', { bubbles: true }),
@@ -111,14 +109,6 @@ function injectText(text) {
   events.forEach((event) => inputElement.dispatchEvent(event));
 }
 
-// Escape HTML to prevent injection
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-// Handle submit/send button
 function submitMessage() {
   // Always rescan submit button in case DOM changed
   submitElement = findElement(config.gemini?.submit);
@@ -391,7 +381,6 @@ function createLoadingOverlay() {
   return overlay;
 }
 
-// Show loading overlay immediately
 let loadingOverlay = null;
 if (document.body) {
   loadingOverlay = createLoadingOverlay();
@@ -401,7 +390,6 @@ if (document.body) {
   });
 }
 
-// Hide loading overlay when page is fully loaded
 window.addEventListener('load', () => {
   if (loadingOverlay) {
     loadingOverlay.style.opacity = '0';

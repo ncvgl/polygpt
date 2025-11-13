@@ -48,20 +48,15 @@ function injectText(text) {
 
   lastText = text;
 
-  // Handle textarea
   if (inputElement.tagName === 'TEXTAREA') {
     inputElement.value = text;
-    // Set selection to end of text
     inputElement.selectionStart = text.length;
     inputElement.selectionEnd = text.length;
   } else if (inputElement.contentEditable === 'true') {
-    // Handle contenteditable div (ProseMirror) - preserve newlines as <br>
-    // Clear existing content - avoid innerHTML due to TrustedHTML CSP
     while (inputElement.firstChild) {
       inputElement.removeChild(inputElement.firstChild);
     }
 
-    // Split by newlines and create text nodes with <br> between them
     const lines = text.split('\n');
     lines.forEach((line, index) => {
       inputElement.appendChild(document.createTextNode(line));
@@ -345,7 +340,6 @@ function createLoadingOverlay() {
   return overlay;
 }
 
-// Show loading overlay immediately
 let loadingOverlay = null;
 if (document.body) {
   loadingOverlay = createLoadingOverlay();
@@ -355,7 +349,6 @@ if (document.body) {
   });
 }
 
-// Hide loading overlay when page is fully loaded
 window.addEventListener('load', () => {
   if (loadingOverlay) {
     loadingOverlay.style.opacity = '0';

@@ -52,21 +52,16 @@ function injectText(text) {
   // Focus the element first
   inputElement.focus();
 
-  // Handle textarea
   if (inputElement.tagName === 'TEXTAREA') {
     inputElement.value = text;
     inputElement.selectionStart = text.length;
     inputElement.selectionEnd = text.length;
   } else if (inputElement.contentEditable === 'true') {
-    // Lexical editor - incremental updates to avoid duplication
-    // Get current content in Perplexity
     const currentContent = inputElement.textContent || '';
 
     if (text === lastText && text === currentContent) {
-      // No change, skip
       return;
     } else if (text.length === 0) {
-      // User cleared all text (Ctrl+A+Delete or cleared input)
       if (currentContent.length > 0) {
         try {
           const sel = window.getSelection();
@@ -395,7 +390,6 @@ function createLoadingOverlay() {
   return overlay;
 }
 
-// Show loading overlay immediately
 let loadingOverlay = null;
 if (document.body) {
   loadingOverlay = createLoadingOverlay();
@@ -405,7 +399,6 @@ if (document.body) {
   });
 }
 
-// Hide loading overlay when page is fully loaded
 window.addEventListener('load', () => {
   if (loadingOverlay) {
     loadingOverlay.style.opacity = '0';
