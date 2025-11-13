@@ -28,13 +28,30 @@
     ],
     "mac": {
       "icon": "assets/icons/icon.icns",
-      "category": "public.app-category.productivity"
+      "category": "public.app-category.productivity",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["universal"]
+        }
+      ]
     },
     "win": {
-      "icon": "assets/icons/no_text.png"
+      "icon": "assets/icons/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ]
     },
     "linux": {
-      "icon": "assets/icons/no_text.png"
+      "icon": "assets/icons/no_text.png",
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Utility"
     }
   }
 }

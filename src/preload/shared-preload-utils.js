@@ -110,53 +110,131 @@ function createControlsContainer() {
 }
 
 function createProviderDropdown() {
-  const dropdown = document.createElement('select');
-  dropdown.id = 'polygpt-provider-dropdown';
-  dropdown.title = 'Switch Provider';
-  return dropdown;
+  const dropdownContainer = document.createElement('div');
+  dropdownContainer.id = 'polygpt-provider-dropdown';
+  dropdownContainer.title = 'Switch Provider';
+
+  const selected = document.createElement('div');
+  selected.className = 'dropdown-selected';
+
+  const menu = document.createElement('div');
+  menu.className = 'dropdown-menu';
+  menu.style.display = 'none';
+
+  dropdownContainer.appendChild(selected);
+  dropdownContainer.appendChild(menu);
+
+  return dropdownContainer;
 }
 
 function styleDropdown(dropdown) {
+  const selected = dropdown.querySelector('.dropdown-selected');
+  const menu = dropdown.querySelector('.dropdown-menu');
+
   Object.assign(dropdown.style, {
+    position: 'relative',
+    cursor: 'pointer',
+  });
+
+  Object.assign(selected.style, {
     border: 'none',
     borderRadius: '6px',
     background: 'rgba(0, 0, 0, 0.5)',
     color: 'white',
     fontSize: '14px',
-    padding: '8px',
+    padding: '8px 12px',
     height: '36px',
-    cursor: 'pointer',
+    minWidth: '100px',
     backdropFilter: 'blur(4px)',
     transition: 'all 0.2s ease',
-    appearance: 'none',
-    WebkitAppearance: 'none',
-    MozAppearance: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    whiteSpace: 'nowrap',
+    userSelect: 'none',
+  });
+
+  Object.assign(menu.style, {
+    position: 'absolute',
+    top: '40px',
+    left: '0',
+    width: '100%',
+    border: 'none',
+    borderRadius: '6px',
+    background: 'rgba(0, 0, 0, 0.9)',
+    backdropFilter: 'blur(4px)',
+    zIndex: '10000000',
+    overflow: 'hidden',
   });
 }
 
 function populateDropdownOptions(dropdown, viewInfo) {
+  const selected = dropdown.querySelector('.dropdown-selected');
+  const menu = dropdown.querySelector('.dropdown-menu');
+
+  const currentProvider = viewInfo.availableProviders.find(p => p.key === viewInfo.provider);
+  selected.textContent = currentProvider ? currentProvider.name : '';
+
   viewInfo.availableProviders.forEach(provider => {
-    const option = document.createElement('option');
-    option.value = provider.key;
+    const option = document.createElement('div');
+    option.className = 'dropdown-option';
+    option.dataset.value = provider.key;
     option.textContent = provider.name;
-    if (provider.key === viewInfo.provider) {
-      option.selected = true;
-    }
-    dropdown.appendChild(option);
+
+    Object.assign(option.style, {
+      padding: '10px 12px',
+      color: 'white',
+      fontSize: '14px',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease',
+      background: provider.key === viewInfo.provider ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+    });
+
+    option.addEventListener('mouseenter', () => {
+      option.style.background = 'rgba(255, 255, 255, 0.2)';
+    });
+
+    option.addEventListener('mouseleave', () => {
+      option.style.background = provider.key === viewInfo.provider ? 'rgba(255, 255, 255, 0.1)' : 'transparent';
+    });
+
+    menu.appendChild(option);
   });
 }
 
 function attachDropdownEventListeners(dropdown, viewInfo) {
-  dropdown.addEventListener('change', async () => {
-    await ipcRenderer.invoke('change-provider', viewInfo.position, dropdown.value);
-  });
+  const selected = dropdown.querySelector('.dropdown-selected');
+  const menu = dropdown.querySelector('.dropdown-menu');
 
-  dropdown.addEventListener('mouseenter', () => {
-    dropdown.style.background = 'rgba(0, 0, 0, 0.7)';
-  });
+  let hideTimeout;
 
-  dropdown.addEventListener('mouseleave', () => {
-    dropdown.style.background = 'rgba(0, 0, 0, 0.5)';
+  const showMenu = () => {
+    if (hideTimeout) clearTimeout(hideTimeout);
+    selected.style.background = 'rgba(0, 0, 0, 0.7)';
+    menu.style.display = 'block';
+  };
+
+  const hideMenu = () => {
+    hideTimeout = setTimeout(() => {
+      selected.style.background = 'rgba(0, 0, 0, 0.5)';
+      menu.style.display = 'none';
+    }, 100);
+  };
+
+  dropdown.addEventListener('mouseenter', showMenu);
+  dropdown.addEventListener('mouseleave', hideMenu);
+  menu.addEventListener('mouseenter', showMenu);
+  menu.addEventListener('mouseleave', hideMenu);
+
+  menu.addEventListener('click', async (e) => {
+    if (e.target.classList.contains('dropdown-option')) {
+      const newProvider = e.target.dataset.value;
+      selected.textContent = e.target.textContent;
+      await ipcRenderer.invoke('change-provider', viewInfo.position, newProvider);
+      if (hideTimeout) clearTimeout(hideTimeout);
+      selected.style.background = 'rgba(0, 0, 0, 0.5)';
+      menu.style.display = 'none';
+    }
   });
 }
 
