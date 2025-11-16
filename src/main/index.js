@@ -45,12 +45,23 @@ app.on('ready', async () => {
   });
 
   ipcMain.handle('refresh-pages', async (event) => {
-    windowManager.POSITIONS.forEach(pos => {
-      const view = mainWindow.viewPositions[pos];
-      if (view && view.webContents) {
-        view.webContents.reload();
-      }
+    const reloadPromises = windowManager.POSITIONS.map(pos => {
+      return new Promise((resolve) => {
+        const view = mainWindow.viewPositions[pos];
+        if (view && view.webContents) {
+          const onLoad = () => {
+            view.webContents.setZoomFactor(currentZoomFactor);
+            view.webContents.removeListener('did-finish-load', onLoad);
+            resolve();
+          };
+          view.webContents.on('did-finish-load', onLoad);
+          view.webContents.reload();
+        } else {
+          resolve();
+        }
+      });
     });
+    await Promise.all(reloadPromises);
     return true;
   });
 
