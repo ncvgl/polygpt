@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="assets/icons/original_white.png" alt="PolyGPT Logo" width="400">
+</div>
+
 # PolyGPT
 
 Interact with multiple AI assistants simultaneously in a split-screen interface. 
