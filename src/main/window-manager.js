@@ -1,4 +1,4 @@
-const { BaseWindow, WebContentsView } = require('electron');
+const { BaseWindow, WebContentsView, Menu } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -93,6 +93,34 @@ function createProviderView(providerKey, position) {
   // Track provider and position
   view.providerKey = providerKey;
   view.position = position;
+
+  // Enable context menu for copy/paste
+  view.webContents.on('context-menu', (event, params) => {
+    const template = [];
+
+    // Add copy option if text is selected
+    if (params.selectionText) {
+      template.push({
+        label: 'Copy',
+        role: 'copy',
+      });
+    }
+
+    // Add paste option for input fields
+    if (params.isEditable) {
+      if (template.length > 0) template.push({ type: 'separator' });
+      template.push({
+        label: 'Paste',
+        role: 'paste',
+      });
+    }
+
+    // Show menu if we have items
+    if (template.length > 0) {
+      const menu = Menu.buildFromTemplate(template);
+      menu.popup();
+    }
+  });
 
   // Load URL
   view.webContents.loadURL(provider.url);
