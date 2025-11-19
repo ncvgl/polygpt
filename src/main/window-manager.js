@@ -155,6 +155,34 @@ async function createWindow() {
     },
   });
 
+  // Enable context menu for copy/paste in control bar
+  mainView.webContents.on('context-menu', (event, params) => {
+    const template = [];
+
+    // Add copy option if text is selected
+    if (params.selectionText) {
+      template.push({
+        label: 'Copy',
+        role: 'copy',
+      });
+    }
+
+    // Add paste option for input fields
+    if (params.isEditable) {
+      if (template.length > 0) template.push({ type: 'separator' });
+      template.push({
+        label: 'Paste',
+        role: 'paste',
+      });
+    }
+
+    // Show menu if we have items
+    if (template.length > 0) {
+      const menu = Menu.buildFromTemplate(template);
+      menu.popup();
+    }
+  });
+
   // Create views based on configuration
   const viewPositions = {
     topLeft: createProviderView(providerConfig.topLeft, 'topLeft'),
