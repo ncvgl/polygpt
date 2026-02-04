@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,sans-serif; background:#fff; height:100vh; display:flex; flex-direction:column; }
+.wrap { display:flex; flex-direction:column; flex:1; padding:12px; gap:6px; border-top:1px solid #e0e0e0; }
+textarea { flex:1; padding:10px; border:1px solid #d0d0d0; border-radius:6px; font:14px -apple-system,sans-serif; resize:none; outline:none; }
+textarea:focus { border-color:#4285f4; box-shadow:0 0 0 3px rgba(66,133,244,.1); }
+.bar { display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#666; }
+.bar button { padding:4px 10px; color:#fff; border:none; border-radius:4px; cursor:pointer; font-size:12px; }
+.new { background:#9c27b0; } .ref { background:#4285f4; } .zm { background:#ff9800; min-width:32px; }
+</style></head><body>
+<div class="wrap">
+  <textarea id="t" placeholder="Type here to mirror to ChatGPT, Gemini, Perplexity, and Claude..." spellcheck="true"></textarea>
+  <div class="bar">
+    <span><span id="c">0</span> chars</span>
+    <span><kbd>Enter</kbd> submit | <kbd>Shift+Enter</kbd> newline</span>
+    <div>
+      <button class="new" onclick="newChat()">New Chat</button>
+      <button class="ref" onclick="refresh()">Refresh</button>
+      <button class="zm" onclick="doZoom(-1)">&minus;</button>
+      <button class="zm" onclick="doZoom(1)">+</button>
+    </div>
+  </div>
+</div>
+<script>
+const {ipcRenderer} = require('electron');
+const t = document.getElementById('t'), c = document.getElementById('c');
+let tid, last = 0;
+t.addEventListener('input', () => {
+  c.textContent = t.value.length;
+  const now = Date.now();
+  clearTimeout(tid);
+  if (now - last >= 50) { last = now; ipcRenderer.invoke('text-update', t.value); }
+  else { tid = setTimeout(() => { last = Date.now(); ipcRenderer.invoke('text-update', t.value); }, 50 - (now - last)); }
+});
+t.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitMsg(); } });
+function submitMsg() { if (!t.value.trim()) return; ipcRenderer.invoke('submit'); t.value = ''; c.textContent = '0'; }
+function newChat() { ipcRenderer.invoke('new-chat'); t.value = ''; c.textContent = '0'; }
+function refresh() { ipcRenderer.invoke('refresh'); }
+function doZoom(d) { ipcRenderer.invoke('zoom', d); }
+t.focus();
+</script>
+</body></html>
