@@ -196,7 +196,12 @@ function styleDropdown(dropdown) {
     background: 'rgba(0, 0, 0, 0.9)',
     backdropFilter: 'blur(4px)',
     zIndex: '10000000',
-    overflow: 'hidden',
+    // Cap the height and scroll instead of growing: a supersized thumbnail panel
+    // is only ~chatAreaHeight/3 tall, so a full provider list would otherwise
+    // run past the bottom edge with no way to reach the last option.
+    maxHeight: '220px',
+    overflowY: 'auto',
+    overflowX: 'hidden',
     boxSizing: 'border-box',
     margin: '0',
     padding: '0',

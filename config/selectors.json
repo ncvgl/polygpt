@@ -74,6 +74,21 @@
       "button[title*='New chat']"
     ]
   },
+  "kimi": {
+    "input": [
+      "div.chat-input-editor[data-lexical-editor='true']",
+      "div.chat-input-editor",
+      "[data-lexical-editor='true'][role='textbox']"
+    ],
+    "submit": [
+      ".send-button-container",
+      "button[aria-label*='Send']"
+    ],
+    "newChat": [
+      "a.new-chat-btn",
+      "a[href*='chat_enter_method=new_chat']"
+    ]
+  },
   "grok": {
     "input": [
       "[data-testid='Grok_Compose_Textarea_ID']",
