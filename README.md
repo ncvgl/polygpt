@@ -5,7 +5,7 @@
 # PolyGPT
 
 Interact with multiple AI assistants simultaneously in a split-screen interface. 
-Type once and send your prompts to ChatGPT, Claude, Gemini, and Perplexity at the same time.
+Type once and send your prompts to ChatGPT, Claude, Gemini, Perplexity, Grok, and Kimi at the same time.
 
 ## Demo
 
@@ -18,7 +18,8 @@ Type once and send your prompts to ChatGPT, Claude, Gemini, and Perplexity at th
 
 ## Features
 
-- **4-way split view** - ChatGPT, Claude, Gemini, and Perplexity in a 2x2 grid
+- **4-way split view** - any four providers at once in a 2x2 grid
+- **Six providers** - ChatGPT, Claude, Gemini, Perplexity, Grok, and Kimi
 - **Unified input** - Type once, send to all providers simultaneously
 - **Provider switching** - Change any quadrant to a different provider on the fly
 - **Supersize mode** - Expand any quadrant to 80% width for focused work

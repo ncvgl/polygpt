@@ -34,6 +34,14 @@ const PROVIDERS = {
     name: 'Grok',
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
   },
+  kimi: {
+    url: 'https://www.kimi.com',
+    preload: 'kimi-preload.js',
+    name: 'Kimi',
+    // Verified: kimi.com serves the full app to Electron's default UA (HTTP 200,
+    // composer present), so no override is needed.
+    userAgent: null,
+  },
 };
 
 // Position keys
@@ -42,23 +50,40 @@ const POSITIONS = ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'];
 // Config file path
 const CONFIG_PATH = path.join(__dirname, '../../config/window-providers.json');
 
-// Load provider configuration
+// Default layout, also the fallback for any slot that fails validation
+const DEFAULT_PROVIDER_CONFIG = {
+  topLeft: "claude",
+  topRight: "grok",
+  bottomLeft: "chatgpt",
+  bottomRight: "gemini"
+};
+
+// Load provider configuration. The file lives in userland and is gitignored, so a
+// stale or hand-edited key must not be fatal: createProviderView throws on an
+// unknown provider, and that throw would escape createWindow() and leave the app
+// with no visible window at all. Fall back per slot instead.
 function loadProviderConfig() {
+  let stored = null;
   try {
     if (fs.existsSync(CONFIG_PATH)) {
-      const data = fs.readFileSync(CONFIG_PATH, 'utf8');
-      return JSON.parse(data);
+      stored = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
     }
   } catch (error) {
     console.error('Failed to load provider config:', error);
   }
-  // Return default configuration
-  return {
-    topLeft: "claude",
-    topRight: "grok",
-    bottomLeft: "chatgpt",
-    bottomRight: "gemini"
-  };
+
+  const config = { ...DEFAULT_PROVIDER_CONFIG };
+  if (stored && typeof stored === 'object') {
+    POSITIONS.forEach(pos => {
+      const key = stored[pos];
+      if (PROVIDERS[key]) {
+        config[pos] = key;
+      } else if (key !== undefined) {
+        console.error(`Ignoring unknown provider "${key}" at ${pos}; using "${config[pos]}"`);
+      }
+    });
+  }
+  return config;
 }
 
 // Save provider configuration
@@ -316,17 +341,19 @@ async function createWindow() {
 
   // Change provider for a position
   function changeProvider(position, newProviderKey, zoomFactor = 1.0) {
-    // Get old view
-    const oldView = viewPositions[position];
-
-    // Remove from window
-    mainWindow.contentView.removeChildView(oldView);
-
-    // Close old view
-    oldView.webContents.close();
-
-    // Create new view
+    // Build the replacement first. createProviderView throws on an unknown
+    // provider key, and tearing the old view down beforehand would leave a
+    // destroyed webContents in viewPositions that every later broadcast trips on.
+    if (!PROVIDERS[newProviderKey]) {
+      console.error(`Refusing to switch ${position} to unknown provider "${newProviderKey}"`);
+      return false;
+    }
     const newView = createProviderView(newProviderKey, position);
+
+    // Retire the old view only once the new one exists
+    const oldView = viewPositions[position];
+    mainWindow.contentView.removeChildView(oldView);
+    oldView.webContents.close();
 
     // Add to window
     mainWindow.contentView.addChildView(newView);
